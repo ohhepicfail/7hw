@@ -1,6 +1,9 @@
 #include <iostream>
 #include <cassert>
+#include <cstdlib>
+#include <ctime>
 
+#define PRINT 0
 
 struct smth {
     int x_ ,y_;
@@ -16,18 +19,67 @@ kth_statistic (T* arr, unsigned narr, unsigned k);
 template <typename T> void
 merge_sort (T* arr, unsigned beg, unsigned end);
 
+void create_data (smth* data, unsigned ndata);
+bool verify_data (smth* data, unsigned ndata);
 
 int main () {
-    unsigned ndata = 4;
-    smth data[] { {0,1}, {1,2}, {0,2}, {1,3} };
+    unsigned ndata = 20;
+    auto data = new smth[ndata];
+    create_data (data, ndata);
 
+    #if PRINT
     for (unsigned i = 0; i < ndata; i++)
         std::cout << data[i].x_ << " " << data[i].y_ << std::endl;
+    #endif
 
     kth_statistic (data, ndata, 0);
+    
+    #if PRINT
     for (unsigned i = 0; i < ndata; i++)
-        std::cout << i << " (" << data[i].x_ << ", " << data[i].y_ << ")\n";
+        std::cout << "(" << data[i].x_ << ", " << data[i].y_ << ")\n";
+    #endif
+    
+    assert (verify_data (data, ndata));
+    std::cout << "\nsuccessfully\n\n";
+
+    delete[] data;
     return 0;
+}
+
+
+void create_data (smth* data, unsigned ndata) {
+    assert (data);
+
+    srand (time (nullptr));
+
+    auto cntr = new unsigned[ndata] ();
+
+    for (unsigned i = 0; i < ndata; i++) {
+        auto tmp =  rand () % (ndata / 2);
+        data[i].x_ = tmp;
+        data[i].y_ = cntr[tmp]++;
+    }
+
+    delete[] cntr;
+}    
+
+
+bool verify_data (smth* data, unsigned ndata) {
+    assert (data);
+
+    if (ndata <= 1)
+        return true;
+
+    for (unsigned i = 1; i < ndata; i++) {
+        if (data[i - 1].x_ > data[i].x_)
+            return false;
+        if (data[i - 1].x_ < data[i].x_)
+            continue;
+        if (data[i - 1].y_ + 1 != data[i].y_)
+            return false;
+    }
+
+    return true;
 }
 
 
@@ -68,3 +120,6 @@ merge_sort (T* arr, unsigned beg, unsigned end) {
     std::copy (data, data + size, arr + beg);
     delete[] data;
 }
+
+
+
